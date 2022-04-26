@@ -1,0 +1,131 @@
+@import '~antd/dist/antd.css';
+
+
+.App {
+  text-align: center;
+  padding:10px;
+  width: fit-content;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.App .tool {
+  position: fixed;
+  display:flex;
+  right: 20px;
+  top: 20px;
+  z-index: 999;
+  flex-direction: column;
+  
+}
+
+.App .tool button {
+  margin-bottom:10px;
+  opacity: 0.4;
+}
+.App .tool button:hover {
+  opacity: 1;
+}
+
+.memos {
+  word-break:break-all;
+  margin-right: 60px;
+  width:fit-content;
+}
+.memo_box {
+  text-align: left;
+  display:flex;
+
+}
+
+.memos>div>div {
+  
+  margin-bottom: 10px;
+  min-height:200px;
+  max-height: 500px;
+  overflow: scroll;
+  
+}
+
+.card_title {
+  display: flex;
+  width: 100%;
+  font-size: 12px;
+}
+.card_title .right_area{
+  display:flex;
+}
+.card_title a {
+  /* padding: 0 8px 0 8px; */
+  /* white-space: nowrap;
+  border: 4px solid transparent; */
+  margin-left: 4px;
+}
+
+.time {
+  color: #8f9193;
+  font-size: 12px;
+  margin-bottom: 4px;
+  width: 100%;
+}
+
+.tag {
+  background-color: #eef3fe;
+  font-size: 12px;
+  padding: 4px;
+}
+.backlinkeds {
+  border-top:1px solid #f0f0f0;
+  padding-top:8px;
+}
+.backlinkeds a{
+  margin:0 4px;
+  
+
+}
+
+.heightlight {
+  border:1px solid #1890ff;
+}
+
+.text-heightlight {
+  border: 2px dotted #ccc;
+  border-radius: 2px;
+}
+
+.drawer {
+  display:none;
+}
