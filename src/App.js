@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Button, Card, BackTop, Drawer, Skeleton } from 'antd';
+import { message,Input, Button, Card, BackTop, Drawer, Skeleton } from 'antd';
 import { useState } from 'react';
 
 import './App.css';
@@ -126,10 +126,12 @@ class Memos extends React.Component {
 
       // 在卡片后面增加新卡片 ==========
 
-
+      let isFinded = false
       for (let i = 0; i < all_memos.length; i++) {
         // 找到点击对象的内容
+        
         if (all_memos[i]['slug'] == targetMemoId) {
+          isFinded = true
           console.log('找到点击对象的内容:');
           console.log(all_memos[i]);
           for (let j = 0; j < memos.length; j++) {
@@ -231,6 +233,12 @@ class Memos extends React.Component {
 
           break
         }
+      }
+
+      if(isFinded!=true){
+        console.log('没有找到此卡片');
+        message.warning('抱歉，此卡片不适合公开');
+
       }
 
     }
