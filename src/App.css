@@ -4,7 +4,12 @@
 .App {
   text-align: center;
   padding:10px;
-  width: fit-content;
+  /* width: fit-content; */
+}
+.App h4{
+  text-align: left;
+  margin: 14px 0;
+  color:
 }
 
 .App-logo {
@@ -128,4 +133,7 @@
 
 .drawer {
   display:none;
+}
+.loadingBox{
+  width:400px
 }

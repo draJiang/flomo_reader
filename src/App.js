@@ -1,5 +1,5 @@
 import React from 'react';
-import { message,Input, Button, Card, BackTop, Drawer, Skeleton } from 'antd';
+import { message, Input, Button, Card, BackTop, Drawer, Skeleton } from 'antd';
 import { useState } from 'react';
 
 import './App.css';
@@ -55,7 +55,6 @@ class Memos extends React.Component {
   // 卡片中的 MEMO 超链接点击时
   handleMemoClick = (e) => {
     console.log('handleMemoClick');
-    // console.log(e);
     // console.log(e.nativeEvent.path);
 
 
@@ -72,44 +71,34 @@ class Memos extends React.Component {
       let thisMemoBoxId
 
       // 遍历事件涉及到的 DOM 元素
-      e.nativeEvent.path.forEach((item) => {
 
-        console.log(item.className);
+      // 在主界面或 drawer 中打开
+      if (e.nativeEvent.target.closest('.ant-drawer-body') != null) {
+        drawer = '.ant-drawer-body'
+      }
 
-        // 在主界面或 drawer 中打开
-        if (item.className == 'ant-drawer-body') {
-          drawer = '.' + item.className + ' '
-        }
-
-        if (item.className == 'memo_box') {
-          thisMemoBoxId = item.dataset.id
-          thisMemoBoxId = thisMemoBoxId.replace(' ', '')
-          thisMemoBoxId = thisMemoBoxId.replace(/\s*/g, "");
-          thisMemoBoxId = thisMemoBoxId.replace(/&nbsp;/ig, "");
-        }
+      thisMemoBoxId = e.nativeEvent.target.closest('.memo_box').dataset.id
+      thisMemoBoxId = thisMemoBoxId.replace(' ', '')
+      thisMemoBoxId = thisMemoBoxId.replace(/\s*/g, "");
+      thisMemoBoxId = thisMemoBoxId.replace(/&nbsp;/ig, "");
 
 
-        if (item.className != undefined) {
-          if (item.className.indexOf('ant-card') >= 0 && item.className.indexOf('memo') >= 0) {
-            thisMemoId = item.dataset.id
-            thisMemoId = thisMemoId.replace(' ', '')
-            thisMemoId = thisMemoId.replace(/\s*/g, "");
-            thisMemoId = thisMemoId.replace(/&nbsp;/ig, "");
-          }
-        }
+
+      thisMemoId = e.nativeEvent.target.closest('.memo').dataset.id
+      thisMemoId = thisMemoId.replace(' ', '')
+      thisMemoId = thisMemoId.replace(/\s*/g, "");
+      thisMemoId = thisMemoId.replace(/&nbsp;/ig, "");
 
 
-      })
 
       // 所有的 MEMO 数据
       let all_memos = this.props.allData
       // 父级组件传进来的数据，在主界面 memos = all_memos，在 Drawer 抽屉中，memos = 部分 all_memos
       let memos = this.props.data
-      console.log('memos:');
-      console.log(memos);
-      console.log('all_memos:');
-      console.log(all_memos);
-      console.log(this.props.data);
+      // console.log('memos:');
+      // console.log(memos);
+      // console.log('all_memos:');
+      // console.log(all_memos);
 
       // 要插入的新卡片的 ID
       let targetMemoId = e.nativeEvent.target.dataset.id
@@ -129,7 +118,7 @@ class Memos extends React.Component {
       let isFinded = false
       for (let i = 0; i < all_memos.length; i++) {
         // 找到点击对象的内容
-        
+
         if (all_memos[i]['slug'] == targetMemoId) {
           isFinded = true
           console.log('找到点击对象的内容:');
@@ -226,7 +215,7 @@ class Memos extends React.Component {
 
               }
 
-
+              break
 
             }
           }
@@ -235,7 +224,7 @@ class Memos extends React.Component {
         }
       }
 
-      if(isFinded!=true){
+      if (isFinded != true) {
         console.log('没有找到此卡片');
         message.warning('抱歉，此卡片不适合公开');
 
@@ -267,14 +256,9 @@ class Memos extends React.Component {
       website = website.replace(/^\s*|\s*$/g, "");
       website = website.replace(/&nbsp;/ig, "");
 
-      if (website.indexOf('MTkzMzY3MjM') > -1) {
-        console.log('website:');
-        console.log(website);
-      }
-
       let short = website.length > 24 ? website.substring(0, 24) + '...' : website
 
-      if (website.indexOf('flomo') >= 0) {
+      if (website.indexOf('https://flomoapp.com') >= 0) {
         return "<a data-id=" + website + " >" + 'MEMO' + "</a>";
       } else {
         return "<a target='_blank' href=" + website + ">" + short + "</a>";
@@ -315,6 +299,18 @@ class Memos extends React.Component {
     const data = this.props.data
     console.log(this.props);
     // console.log(data);
+
+    // 加载状态
+    if (this.props.isLoadinge) {
+      return (
+        <div className='memos'>
+
+          <div><Skeleton active /></div>
+
+        </div>
+      )
+    }
+
     let source = this.props.source
     if (data !== undefined) {
       // console.log(data);
@@ -325,7 +321,6 @@ class Memos extends React.Component {
         // 遍历每一列的 Memo
         let listItems = []
 
-        console.log('source:' + source);
         // 如果是在渲染关联笔记
         // 忽略首个数据，只渲染 3 条数据
         if (source == 'drawer') {
@@ -419,9 +414,10 @@ class App extends React.Component {
     this.state = {
       memos: [],                          // 本地处理后的 memos 数据
       data: [],                           // 服务端提供的原始 memos 数据
-      isLoading: true,                    // 加载状态
+      isLoading: true,                    // 抽屉的加载状态
       drawerVisible: false,               // 控制 Drawer 抽屉的显隐
-      link_memo: []                       // 关联的笔记数据
+      link_memo: [],                       // 关联的笔记数据
+      mainMemosIsLoading: true
     }
 
 
@@ -429,12 +425,17 @@ class App extends React.Component {
 
   componentDidMount = () => {
     console.log('componentDidMount');
+
+    this.setState({
+      mainMemosIsLoading: true
+    })
+
     fetch(my_ip + 'get_memos')
       .then((response) => response.json())
       .then((json) => {
 
         console.log(json);
-        this.setState({ data: json });
+
 
         let data = json.data
 
@@ -445,16 +446,14 @@ class App extends React.Component {
         }))
 
         this.setState({
-          memos: newObj
+          memos: newObj,
+          mainMemosIsLoading: false
         }, () => {
-
 
 
         })
 
         console.log('this.state.memos:');
-        console.log(this.state.memos);
-        console.log(this.state.data);
 
       })
       .catch((error) => console.error(error))
@@ -476,16 +475,14 @@ class App extends React.Component {
   // 点击随机漫游笔记按钮
   handleStrayButtonClick = () => {
     // 随机漫游到某一个卡片中
-
-    let max = this.state.data.data.length
+    let memos = this.state.memos
+    let max = memos.length
     let min = 0
 
     let index = parseInt(Math.random() * (max - min + 1) + min, 10)
     console.log(index);
-    console.log(this.state.data);
-    console.log(this.state.data.data[index]);
 
-    document.querySelector('.memo_box[data-id=' + this.state.data.data[index]['slug'] + ']').scrollIntoView({ behavior: "smooth" })
+    document.querySelector('.memo_box[data-id=' + memos[index]['slug'] + ']').scrollIntoView({ behavior: "smooth" })
     // setTimeout(()=>{this.handBackButtonClick()},15)
 
   }
@@ -542,14 +539,25 @@ class App extends React.Component {
   render() {
 
     let memos = <div><Skeleton active /></div>
+    let mainMemos = <div><Skeleton active /></div>
+    console.log('this.state:');
+    console.log(this.state);
+
     if (this.state.isLoading) {
-      memos = <div><Skeleton active /></div>
+      memos = <div className='loadingBox'><Skeleton active /><Skeleton active /></div>
     } else {
       memos = <Memos source='drawer' allData={this.state.memos} data={this.state.link_memo} />
     }
 
+    if (this.state.mainMemosIsLoading) {
+      mainMemos = <div className='loadingBox'><Skeleton active /><Skeleton active /></div>
+    } else {
+      mainMemos = <Memos source='main' handleLinkButtonClick={this.handleLinkButtonClick} allData={this.state.memos} data={this.state.memos} />
+    }
+    // mainMemos = <div className='loadingBox'><Skeleton active /><Skeleton active /></div>
     return (
       <div className="App">
+        <h4>📗 江子龙的公开笔记</h4>
         <div className='tool'>
           <Button className='stray—button' icon={<CompassOutlined />} onClick={this.handleStrayButtonClick} />
           <Button className='stray—button' icon={<LeftOutlined />} onClick={this.handBackButtonClick} />
@@ -559,7 +567,7 @@ class App extends React.Component {
             {memos}
           </Drawer>
         </div>
-        <Memos source='main' handleLinkButtonClick={this.handleLinkButtonClick} allData={this.state.memos} data={this.state.memos} />
+        {mainMemos}
         <BackTop />
       </div>
 
