@@ -1,5 +1,5 @@
 import React from 'react';
-import { message, Input, Button, Card, BackTop, Drawer, Skeleton } from 'antd';
+import { message, Tooltip, Input, Button, Card, BackTop, Drawer, Skeleton } from 'antd';
 import { useState } from 'react';
 
 import './App.css';
@@ -10,9 +10,9 @@ import locale from 'antd/lib/date-picker/locale/en_US';
 import { RadarChartOutlined, RightCircleOutlined, DeploymentUnitOutlined } from '@ant-design/icons';
 
 
-import { CompassOutlined, LeftOutlined } from '@ant-design/icons';
+import { CompassOutlined,FilterOutlined, LeftOutlined } from '@ant-design/icons';
 
-console.log('0911');
+console.log('04271735');
 
 // 你的 IP 地址，将通过此地址获取 flomo 数据
 const my_ip = 'https://my-first-api-drajiang.vercel.app/'
@@ -412,12 +412,14 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      memos: [],                          // 本地处理后的 memos 数据
+      allMemos: [],                       // 本地处理后的完整 memos 数据
+      memos: [],                          // 本地处理后的 memos 数据（如果用户筛选数据，则此数据不等于完整数据）
       data: [],                           // 服务端提供的原始 memos 数据
       isLoading: true,                    // 抽屉的加载状态
       drawerVisible: false,               // 控制 Drawer 抽屉的显隐
-      link_memo: [],                       // 关联的笔记数据
-      mainMemosIsLoading: true
+      link_memo: [],                      // 关联的笔记数据
+      mainMemosIsLoading: true,           // 主界面 Memos 数据的加载状态
+      isFilter:false                      // 记录当前是否为筛选后的数据
     }
 
 
@@ -446,6 +448,7 @@ class App extends React.Component {
         }))
 
         this.setState({
+          allMemos: newObj,
           memos: newObj,
           mainMemosIsLoading: false
         }, () => {
@@ -536,6 +539,48 @@ class App extends React.Component {
     })
   }
 
+  // 筛选没有链接的笔记
+  filterLinkIsNone = () => {
+
+    console.log('filterLinkIsNone');
+    let filterMemos = []
+    let allMemos = this.state.allMemos
+    let memos = this.state.memos
+
+
+    // 再次点击可以取消筛选
+    if (allMemos.length != memos.length) {
+      // 当前处于筛选状态：恢复显示全部数据
+      this.setState({
+        memos: allMemos,
+        isFilter:false
+      })
+    } else {
+      // 当前不处于筛选状态：筛选数据
+      // 遍历所有数据
+      allMemos.forEach((item) => {
+
+        // 若笔记中不存在链接，则表示为目标数据
+        if (item['item'][0]['content'].indexOf('https://flomoapp.com/') < 0) {
+          filterMemos.push(item)
+        }
+
+
+      })
+
+      this.setState({
+        memos: filterMemos,
+        isFilter:true
+      })
+    }
+
+
+
+
+
+
+  }
+
   render() {
 
     let memos = <div><Skeleton active /></div>
@@ -552,8 +597,14 @@ class App extends React.Component {
     if (this.state.mainMemosIsLoading) {
       mainMemos = <div className='loadingBox'><Skeleton active /><Skeleton active /></div>
     } else {
-      mainMemos = <Memos source='main' handleLinkButtonClick={this.handleLinkButtonClick} allData={this.state.memos} data={this.state.memos} />
+      mainMemos = <Memos source='main' handleLinkButtonClick={this.handleLinkButtonClick} allData={this.state.allMemos} data={this.state.memos} />
     }
+
+    let filterButtonType = 'default'
+    if(this.state.isFilter){
+      filterButtonType = 'primary' 
+    }
+
     // mainMemos = <div className='loadingBox'><Skeleton active /><Skeleton active /></div>
     return (
       <div className="App">
@@ -561,6 +612,9 @@ class App extends React.Component {
         <div className='tool'>
           <Button className='stray—button' icon={<CompassOutlined />} onClick={this.handleStrayButtonClick} />
           <Button className='stray—button' icon={<LeftOutlined />} onClick={this.handBackButtonClick} />
+          <Tooltip placement="left" title="筛选无链接的笔记">
+            <Button type={filterButtonType} icon={<FilterOutlined />} onClick={this.filterLinkIsNone} />
+          </Tooltip>
         </div>
         <div className='drawer'>
           <Drawer width={900} title="线索" placement="right" onClose={this.onDrawerClose} visible={this.state.drawerVisible}>
