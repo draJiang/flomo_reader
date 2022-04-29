@@ -359,11 +359,11 @@ class Memos extends React.Component {
           // flomo 原地址
           let flomo_link = 'https://flomoapp.com/mine/?memo_id=' + item.item[i].slug.replace(/\s*/g, "")
 
-          let findClud = ''
-          if (source != 'drawer') {
-            // 如果 MEMO 所在位置不是在 Drawer 抽屉中，则显示「查找线索」按钮，否则隐藏
-            findClud = <Button type="text" size='small' onClick={this.findClue.bind()} shape="default" icon={<DeploymentUnitOutlined />}></Button>
-          }
+          // let findClud = ''
+          // if (source != 'drawer') {
+          //   // 如果 MEMO 所在位置不是在 Drawer 抽屉中，则显示「查找线索」按钮，否则隐藏
+          //   findClud = <Button type="text" size='small' onClick={this.findClue.bind()} shape="default" icon={<DeploymentUnitOutlined />}></Button>
+          // }
 
           let card = <Card className='memo' key={item.item[i].slug} data-id={item.item[i].slug} title='' size="small" onClick={this.handleMemoClick} style={{ width: 400 }}>
             <div className='card_title'>
@@ -371,7 +371,7 @@ class Memos extends React.Component {
               <div className='time'>{item.item[i]['created_at']}</div>
 
               <div className='right_area'>
-                {findClud}
+                {/* {findClud} */}
                 <a href={flomo_link} target='_blank' ><Button type="text" size='small' shape="default" icon={<RightCircleOutlined />}></Button></a>
               </div>
 
@@ -567,6 +567,8 @@ class App extends React.Component {
 
 
       })
+
+      message.info('共 '+filterMemos.length.toString()+' 条卡片');
 
       this.setState({
         memos: filterMemos,
